@@ -101,6 +101,7 @@ Tweet rules: standalone, lead with the hook, under 270 chars, 1-3 hashtags.
 Platform safety (this page must never violate Facebook/Instagram policies):
 - Never glorify or sensationalize violence; report it neutrally. Attribute every health/medical claim to its source (e.g. "according to the DGHS"). Use strictly neutral wording on political and communal stories.
 - story_risk: "clean" for normal news; "sensitive" for violent crime, disasters, communal or health stories (your wording must be extra careful); "graphic" if the story centers on gory/disturbing details (it will be posted without a photo); "do_not_post" ONLY if the story cannot be covered at all without violating platform policy (gratuitous gore, glorifying violence or terrorism, explicit content).
+- Soften, never censor: for sensitive/graphic stories use plain clinical wording ("killed", "injured") and skip gory specifics (method details, wound descriptions, suffering) — but keep every word intact and factual. Never mask words with symbols or slang ("k*lled", "unalived"): masking looks spammy and platforms detect it anyway. The goal is that almost every story remains postable through neutral wording.
 - image_safe: a photo may be attached to this message. Set image_safe=false if it shows blood, dead bodies, graphic injuries, weapons being used on people, or nudity — anything Meta's filters would flag. If no photo is attached, set true.
 
 STORY HEADLINES (from the outlets):
