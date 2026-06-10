@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Sandesh Auto Post</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Newsreader:opsz,wght@6..72,500;6..72,600&family=JetBrains+Mono:wght@500&family=Noto+Sans+Bengali:wght@400;500;700;800&family=Noto+Serif+Bengali:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{ --accent:oklch(0.55 0.19 27); }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{ background:#fff; }
+
+  /* ---------- POST (1080 x 1350) — design ported from Sandesh Post Studio ---------- */
+  #post{
+    width:1080px; height:1350px; position:relative; overflow:hidden; background:#101013;
+    font-family:'Archivo','Noto Sans Bengali',sans-serif;
+  }
+  .p-img-wrap{ position:absolute; left:0; top:0; right:0; overflow:hidden; background:#23221f; }
+  .p-img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .p-credit{
+    position:absolute; right:0; bottom:0; font-size:19px; font-weight:500; letter-spacing:0.04em;
+    color:rgba(255,255,255,.85); background:rgba(12,12,14,.6); padding:8px 18px;
+  }
+  .p-body{ position:absolute; left:0; right:0; bottom:0; padding:58px 64px 150px; }
+  .p-cat{ display:inline-block; font-weight:800; letter-spacing:0.22em; text-transform:uppercase; font-size:26px; }
+  .p-title{ margin-top:26px; font-weight:800; }
+  .p-desc{ margin-top:26px; font-size:31px; line-height:1.42; font-weight:400; }
+  .p-foot{ position:absolute; left:64px; right:64px; bottom:52px; display:flex; align-items:center; gap:14px; }
+  .p-brand{ display:flex; align-items:center; gap:13px; font-weight:900; font-size:30px; letter-spacing:0.14em; }
+  .p-brand i{ width:18px; height:18px; background:var(--accent); display:block; }
+  .p-meta{ margin-left:auto; display:flex; align-items:center; gap:14px; font-size:23px; font-weight:500; letter-spacing:0.02em; }
+  .p-meta span{ white-space:nowrap; }
+  .p-newsrc{ max-width:430px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+  /* — Editorial — */
+  #post.t-editorial{ background:#FAF6EE; }
+  #post.t-editorial .p-img-wrap{ height:704px; }
+  #post.t-editorial .p-body{ height:646px; background:#FAF6EE; border-top:8px solid var(--accent); }
+  #post.t-editorial .p-cat{ color:var(--accent); }
+  #post.t-editorial .p-title{ font-family:'Newsreader','Noto Serif Bengali',serif; font-weight:600; color:#181610; line-height:1.06; letter-spacing:-0.005em; }
+  #post.t-editorial .p-desc{ color:#5c574d; }
+  #post.t-editorial .p-foot{ border-top:1.5px solid #ddd6c8; padding-top:30px; }
+  #post.t-editorial .p-brand{ color:#181610; }
+  #post.t-editorial .p-meta{ color:#8f8a7e; }
+
+  /* — Impact — */
+  #post.t-impact{ background:#101013; }
+  #post.t-impact .p-img-wrap{ height:660px; }
+  #post.t-impact .p-body{ height:690px; background:#101013; padding-top:74px; }
+  #post.t-impact .p-cat{ background:var(--accent); color:#fff; padding:14px 26px; position:absolute; top:-31px; left:64px; }
+  #post.t-impact .p-title{ color:#f4f4f2; line-height:1.04; letter-spacing:-0.012em; margin-top:34px; }
+  #post.t-impact .p-desc{ color:#a3a3ab; }
+  #post.t-impact .p-foot{ border-top:1.5px solid #2a2a30; padding-top:30px; }
+  #post.t-impact .p-brand{ color:#f4f4f2; }
+  #post.t-impact .p-meta{ color:#76767e; }
+
+  /* — Overlay — */
+  #post.t-overlay .p-img-wrap{ height:1350px; }
+  #post.t-overlay .p-scrim{
+    position:absolute; inset:0;
+    background:linear-gradient(180deg, rgba(8,8,10,0) 30%, rgba(8,8,10,.52) 55%, rgba(8,8,10,.94) 88%);
+  }
+  #post.t-overlay .p-body{ background:none; }
+  #post.t-overlay .p-cat{ color:#fff; border:3px solid var(--accent); background:color-mix(in oklab, var(--accent) 88%, black); padding:12px 24px; }
+  #post.t-overlay .p-title{ color:#fff; line-height:1.05; letter-spacing:-0.008em; text-shadow:0 2px 24px rgba(0,0,0,.35); }
+  #post.t-overlay .p-desc{ color:rgba(255,255,255,.84); }
+  #post.t-overlay .p-foot{ border-top:1.5px solid rgba(255,255,255,.22); padding-top:30px; }
+  #post.t-overlay .p-brand{ color:#fff; }
+  #post.t-overlay .p-meta{ color:rgba(255,255,255,.62); }
+  #post.t-overlay .p-credit{ bottom:auto; top:0; }
+
+  /* — Breaking — */
+  .p-banner{
+    display:none; position:absolute; top:0; left:0; right:0; height:72px; z-index:2;
+    background:var(--accent); color:#fff; align-items:center; justify-content:center;
+    font-size:32px; font-weight:900; letter-spacing:0.28em; text-transform:uppercase;
+  }
+  #post.t-breaking{ background:#101013; }
+  #post.t-breaking .p-banner{ display:flex; }
+  #post.t-breaking .p-img-wrap{ top:72px; height:632px; }
+  #post.t-breaking .p-body{ height:646px; background:#101013; padding-top:64px; }
+  #post.t-breaking .p-cat{ display:none; }
+  #post.t-breaking .p-title{ color:#f4f4f2; line-height:1.04; letter-spacing:-0.012em; margin-top:0; }
+  #post.t-breaking .p-desc{ color:#a3a3ab; }
+  #post.t-breaking .p-foot{ border-top:1.5px solid #2a2a30; padding-top:30px; }
+  #post.t-breaking .p-brand{ color:#f4f4f2; }
+  #post.t-breaking .p-meta{ color:#76767e; }
+
+  /* — Sport — */
+  #post.t-sport{ background:#12151b; }
+  #post.t-sport .p-img-wrap{ height:700px; clip-path:polygon(0 0,100% 0,100% 100%,0 88%); background:#12151b; }
+  #post.t-sport .p-body{ height:650px; background:none; }
+  #post.t-sport .p-cat{ background:var(--accent); color:#fff; padding:12px 26px; font-style:italic; transform:skew(-10deg); transform-origin:left bottom; }
+  #post.t-sport .p-title{ color:#fff; font-weight:900; font-style:italic; text-transform:uppercase; line-height:1.06; letter-spacing:0; }
+  #post.t-sport .p-desc{ color:#9aa3ad; }
+  #post.t-sport .p-foot{ border-top:1.5px solid #262b33; padding-top:30px; }
+  #post.t-sport .p-brand{ color:#fff; }
+  #post.t-sport .p-meta{ color:#6f7780; }
+
+  /* — Tribute — */
+  #post.t-tribute{ background:#0b0b0c; }
+  #post.t-tribute .p-img{ filter:grayscale(1) contrast(1.05); }
+  #post.t-tribute .p-img-wrap{ height:704px; }
+  #post.t-tribute .p-body{ height:646px; background:#0b0b0c; border-top:1.5px solid #33333a; }
+  #post.t-tribute .p-cat{ color:#9a958c; font-weight:600; letter-spacing:0.3em; }
+  #post.t-tribute .p-title{ font-family:'Newsreader','Noto Serif Bengali',serif; font-weight:500; color:#f1efe9; line-height:1.1; }
+  #post.t-tribute .p-desc{ color:#8e8c86; }
+  #post.t-tribute .p-foot{ border-top:1.5px solid #26262a; padding-top:30px; }
+  #post.t-tribute .p-brand{ color:#f1efe9; }
+  #post.t-tribute .p-brand i{ background:#6f6d68; }
+  #post.t-tribute .p-meta{ color:#6f6d68; }
+
+  /* — Highlighted word on dark templates — */
+  #post.t-impact .p-title .hl, #post.t-overlay .p-title .hl, #post.t-breaking .p-title .hl, #post.t-sport .p-title .hl{
+    color:#fff; background:var(--accent); padding:2px 16px 6px;
+    -webkit-box-decoration-break:clone; box-decoration-break:clone;
+  }
+  #post.t-editorial .p-title .hl, #post.t-tribute .p-title .hl{ color:var(--accent); }
+
+  /* — No photo: text-led layout, body fills the card — */
+  #post.no-photo .p-img-wrap{ display:none; }
+  #post.no-photo .p-body{
+    top:0; bottom:0; height:auto !important; padding-top:170px;
+    display:flex; flex-direction:column; justify-content:center; border-top:none !important;
+  }
+  #post.no-photo.t-impact .p-cat{ position:static; display:inline-block; align-self:flex-start; margin-bottom:8px; }
+  #post.no-photo.t-breaking .p-body{ top:72px; }
+  #post.no-photo .p-title{ font-size-adjust:none; }
+
+  /* — Bangla: taller line-height so matras & conjuncts don't clip — */
+  #post.bn .p-title{ line-height:1.3 !important; letter-spacing:0 !important; }
+  #post.bn .p-desc{ line-height:1.6; }
+  #post.bn .p-cat{ letter-spacing:0.08em; }
+
+  /* ---------- STORY / DETAILS PAGE (slide 2) — ported from the studio ---------- */
+  #story{
+    width:1080px; height:1350px; position:relative; overflow:hidden; display:none;
+    font-family:'Archivo','Noto Sans Bengali',sans-serif;
+  }
+  #story .s-head{
+    position:absolute; top:52px; left:64px; right:64px;
+    display:flex; align-items:center; padding-bottom:28px;
+  }
+  #story .s-date{ margin-left:auto; font-size:24px; font-weight:500; }
+  #story .s-cat{
+    position:absolute; top:168px; left:64px;
+    font-weight:800; letter-spacing:0.22em; text-transform:uppercase; font-size:26px; color:var(--accent);
+  }
+  #story .s-body{ position:absolute; top:248px; left:64px; right:64px; bottom:150px; overflow:hidden; }
+  .s-body p{ font-size:34px; line-height:1.6; margin:0 0 34px; }
+  #story.t-editorial .s-body p, #story.t-tribute .s-body p{ font-family:'Newsreader','Noto Serif Bengali',serif; font-weight:500; }
+  #story.bn .s-body p{ line-height:1.78; }
+  #story .s-foot{
+    position:absolute; bottom:52px; left:64px; right:64px;
+    display:flex; justify-content:space-between; font-size:24px; font-weight:500; padding-top:28px;
+  }
+  #story .s-foot span{ white-space:nowrap; }
+  #story.t-editorial{ background:#FAF6EE; }
+  #story.t-editorial .s-head{ border-bottom:1.5px solid #ddd6c8; }
+  #story.t-editorial .p-brand{ color:#181610; }
+  #story.t-editorial .s-date, #story.t-editorial .s-foot{ color:#8f8a7e; }
+  #story.t-editorial .s-body p{ color:#3a362e; }
+  #story.t-editorial .s-foot{ border-top:1.5px solid #ddd6c8; }
+  #story.t-impact, #story.t-overlay, #story.t-breaking, #story.t-sport{ background:#101013; }
+  #story.t-impact .s-head, #story.t-overlay .s-head, #story.t-breaking .s-head, #story.t-sport .s-head{ border-bottom:1.5px solid #2a2a30; }
+  #story.t-impact .p-brand, #story.t-overlay .p-brand, #story.t-breaking .p-brand, #story.t-sport .p-brand{ color:#f4f4f2; }
+  #story.t-impact .s-date, #story.t-overlay .s-date, #story.t-breaking .s-date, #story.t-sport .s-date,
+  #story.t-impact .s-foot, #story.t-overlay .s-foot, #story.t-breaking .s-foot, #story.t-sport .s-foot{ color:#76767e; }
+  #story.t-impact .s-body p, #story.t-overlay .s-body p, #story.t-breaking .s-body p, #story.t-sport .s-body p{ color:#d6d6da; }
+  #story.t-impact .s-foot, #story.t-overlay .s-foot, #story.t-breaking .s-foot, #story.t-sport .s-foot{ border-top:1.5px solid #2a2a30; }
+  #story.t-tribute{ background:#0b0b0c; }
+  #story.t-tribute .s-head{ border-bottom:1.5px solid #33333a; }
+  #story.t-tribute .p-brand{ color:#f1efe9; }
+  #story.t-tribute .p-brand i{ background:#6f6d68; }
+  #story.t-tribute .s-date, #story.t-tribute .s-foot{ color:#6f6d68; }
+  #story.t-tribute .s-body p{ color:#cfcdc7; }
+  #story.t-tribute .s-foot{ border-top:1.5px solid #26262a; }
+</style>
+</head>
+<body>
+<div id="post" class="t-editorial">
+  <div class="p-banner" id="pBanner"></div>
+  <div class="p-img-wrap">
+    <img class="p-img" id="pImg" alt="" style="display:none">
+    <div class="p-scrim" id="pScrim" style="display:none"></div>
+    <div class="p-credit" id="pCredit"></div>
+  </div>
+  <div class="p-body">
+    <span class="p-cat" id="pCat"></span>
+    <div class="p-title" id="pTitle"></div>
+    <div class="p-desc" id="pDesc"></div>
+  </div>
+  <div class="p-foot">
+    <div class="p-brand"><i></i><span id="pBrand">SANDESH</span></div>
+    <div class="p-meta">
+      <span class="p-newsrc" id="pNewsSrc"></span>
+      <span id="pSep">·</span>
+      <span id="pDate"></span>
+    </div>
+  </div>
+</div>
+
+<div id="story" class="t-editorial">
+  <div class="s-head">
+    <div class="p-brand"><i></i><span id="sBrand">SANDESH</span></div>
+    <div class="s-date" id="sDate"></div>
+  </div>
+  <div class="s-cat" id="sCat"></div>
+  <div class="s-body" id="sBody"></div>
+  <div class="s-foot"><span id="sPage"></span><span id="sSource"></span></div>
+</div>
+
+<script>
+  // Title sizing rules ported from Sandesh Post Studio
+  function titleSize(len, tpl){
+    var s;
+    if(len<=40) s=92; else if(len<=70) s=78; else if(len<=100) s=66; else s=56;
+    if(tpl==='editorial') s=Math.round(s*1.02);
+    if(tpl==='overlay') s=Math.round(s*0.95);
+    if(tpl==='breaking') s=Math.round(s*0.92);
+    if(tpl==='sport') s=Math.round(s*0.82);
+    return s;
+  }
+
+  // data = {template, accent, brand, category, title, desc, date, source, image, credit}
+  window.renderPost = function(data){
+    var post = document.getElementById('post');
+    var hasBn = /[ঀ-৿]/.test((data.title||'') + (data.desc||''));
+    var tpl = data.template || 'editorial';
+    var img = data.image || '';
+    if(!img && tpl === 'overlay') tpl = 'impact';  // overlay needs a photo
+
+    post.className = 't-' + tpl + (hasBn ? ' bn' : '') + (img ? '' : ' no-photo');
+    if(data.accent) document.documentElement.style.setProperty('--accent', data.accent);
+
+    document.getElementById('pBanner').textContent = 'BREAKING NEWS';
+    document.getElementById('pCat').textContent = data.category || 'NEWS';
+    // "[[phrase]]" in the title becomes the accent-highlighted span
+    var esc = function(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); };
+    document.getElementById('pTitle').innerHTML =
+      esc(data.title || '').replace(/\[\[(.+?)\]\]/g, '<span class="hl">$1</span>');
+    document.getElementById('pDesc').textContent = data.desc || '';
+    document.getElementById('pDesc').style.display = data.desc ? '' : 'none';
+    document.getElementById('pBrand').textContent = data.brand || 'SANDESH';
+    document.getElementById('pNewsSrc').textContent = data.source || '';
+    document.getElementById('pSep').style.display = data.source ? '' : 'none';
+    document.getElementById('pDate').textContent = data.date || '';
+    document.getElementById('pCredit').textContent = data.credit || '';
+    document.getElementById('pCredit').style.display = data.credit ? '' : 'none';
+    document.getElementById('pScrim').style.display = (tpl === 'overlay') ? '' : 'none';
+
+    var pImg = document.getElementById('pImg');
+    var imgReady = Promise.resolve();
+    if(img){
+      imgReady = new Promise(function(res){
+        pImg.onload = function(){ res(); };
+        pImg.onerror = function(){
+          pImg.style.display = 'none';
+          post.classList.add('no-photo');
+          res();
+        };
+      });
+      pImg.src = img;
+      pImg.style.display = '';
+    } else {
+      pImg.style.display = 'none';
+    }
+
+    var pTitle = document.getElementById('pTitle');
+    var pDesc = document.getElementById('pDesc');
+    pTitle.style.fontSize = titleSize((data.title||'').replace(/\[\[|\]\]/g,'').length, tpl) + 'px';
+    pDesc.style.fontSize = (data.desc && data.desc.length > 200) ? '28px' : '31px';
+
+    // shrink until the text fits its panel (ported from the studio's fitText)
+    function fit(){
+      var body = post.querySelector('.p-body');
+      var foot = post.querySelector('.p-foot');
+      var guard = 40;
+      while(guard-- > 0){
+        var bodyRect = body.getBoundingClientRect();
+        var footRect = foot.getBoundingClientRect();
+        var limit = (tpl === 'overlay' || !img) ? footRect.top - 24 : bodyRect.bottom;
+        var descRect = (data.desc ? pDesc : pTitle).getBoundingClientRect();
+        var overflow = descRect.bottom > (footRect.top - 24) ||
+                       body.scrollHeight > body.clientHeight + 2;
+        if(!overflow) break;
+        var ts = parseFloat(pTitle.style.fontSize);
+        var ds = parseFloat(pDesc.style.fontSize);
+        var shrunk = false;
+        if(ts > 46){ pTitle.style.fontSize = (ts - 3) + 'px'; shrunk = true; }
+        if(data.desc && ds > 23){ pDesc.style.fontSize = (ds - 1) + 'px'; shrunk = true; }
+        if(!shrunk) break;
+      }
+    }
+
+    return Promise.all([document.fonts.ready, imgReady]).then(function(){
+      fit();
+      window.__POST_READY__ = true;
+      return true;
+    });
+  };
+
+  // data = {template, accent, brand, category, paragraphs, date, source, page}
+  // Fills the page with as many paragraphs as fit (at least one, shrinking if
+  // a single paragraph is too tall) and reports the count in __STORY_FIT__ so
+  // the renderer can paginate the rest onto further slides.
+  window.renderStory = function(data){
+    document.getElementById('post').style.display = 'none';
+    var story = document.getElementById('story');
+    story.style.display = 'block';
+    var paras = data.paragraphs || [];
+    var hasBn = /[ঀ-৿]/.test(paras.join(''));
+    story.className = 't-' + (data.template || 'editorial') + (hasBn ? ' bn' : '');
+    if(data.accent) document.documentElement.style.setProperty('--accent', data.accent);
+
+    document.getElementById('sBrand').textContent = data.brand || 'SANDESH';
+    document.getElementById('sDate').textContent = data.date || '';
+    document.getElementById('sCat').textContent = data.category || 'NEWS';
+    document.getElementById('sPage').textContent = data.page || '';
+    document.getElementById('sSource').textContent = data.source ? 'Source: ' + data.source : '';
+
+    var body = document.getElementById('sBody');
+
+    return document.fonts.ready.then(function(){
+      body.innerHTML = '';
+      var placed = 0;
+      for(var i = 0; i < paras.length; i++){
+        var p = document.createElement('p');
+        p.textContent = paras[i];
+        body.appendChild(p);
+        if(body.scrollHeight > body.clientHeight + 2){
+          if(placed === 0){
+            // a single huge paragraph: shrink it until it fits
+            var size = 34;
+            while(body.scrollHeight > body.clientHeight + 2 && size > 24){
+              size -= 1;
+              p.style.fontSize = size + 'px';
+              p.style.marginBottom = size + 'px';
+            }
+            placed = 1;
+          } else {
+            body.removeChild(p);
+          }
+          break;
+        }
+        placed++;
+      }
+      window.__STORY_FIT__ = placed;
+      window.__POST_READY__ = true;
+      return placed;
+    });
+  };
+</script>
+</body>
+</html>

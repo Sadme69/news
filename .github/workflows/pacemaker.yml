@@ -1,0 +1,55 @@
+name: Pacemaker
+
+# GitHub's cron scheduler never registered this repo's hourly schedule, so
+# this workflow IS the scheduler: it wakes at :05 every hour and dispatches
+# the news bot — but only if nothing else (e.g. a healed cron) already ran it.
+# Each instance lives ~5 hours, then dispatches a fresh copy of itself.
+# The news-bot workflow also restarts the pacemaker if the chain ever breaks.
+
+on:
+  workflow_dispatch: {}
+
+permissions: {}
+
+concurrency:
+  group: pacemaker
+  cancel-in-progress: true   # a freshly respawned instance replaces the old one
+
+jobs:
+  pace:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    steps:
+      - name: Hourly heartbeat (5 cycles, then respawn)
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+          REPO: ${{ github.repository }}
+        run: |
+          api() { curl -s -H "Authorization: Bearer $GH_PAT" -H "Accept: application/vnd.github+json" "$@"; }
+
+          for cycle in 1 2 3 4 5; do
+            # sleep until the next hh:05:00 UTC
+            min=$((10#$(date -u +%M))); sec=$((10#$(date -u +%S)))
+            wait=$(( ((65 - min) % 60) * 60 - sec ))
+            [ $wait -le 0 ] && wait=$((wait + 3600))
+            echo "cycle $cycle: sleeping ${wait}s until next :05"
+            sleep $wait
+
+            # watchdog: skip if the news bot already ran in the last 55 min
+            # (covers the case where GitHub's own cron comes back to life)
+            latest=$(api "https://api.github.com/repos/$REPO/actions/workflows/news-bot.yml/runs?per_page=1" \
+                     | jq -r '.workflow_runs[0].created_at // empty')
+            cutoff=$(date -u -d '55 minutes ago' +%Y-%m-%dT%H:%M:%SZ)
+            if [ -n "$latest" ] && [ "$latest" \> "$cutoff" ]; then
+              echo "news bot already ran at $latest — skipping dispatch"
+              continue
+            fi
+
+            echo "dispatching news bot"
+            api -X POST "https://api.github.com/repos/$REPO/actions/workflows/news-bot.yml/dispatches" \
+                -d '{"ref":"main"}' || true
+          done
+
+          echo "respawning pacemaker"
+          api -X POST "https://api.github.com/repos/$REPO/actions/workflows/pacemaker.yml/dispatches" \
+              -d '{"ref":"main"}'

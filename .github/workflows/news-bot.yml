@@ -1,0 +1,101 @@
+name: News bot
+
+on:
+  schedule:
+    - cron: "5 * * * *"       # hourly at :05 — near the top of each hour (12:05am, 1:05am, ... BDT) while dodging the congested :00 slot GitHub tends to drop
+  workflow_dispatch: {}       # manual run button
+
+permissions:
+  contents: write
+
+concurrency:
+  group: news-bot
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          playwright install --with-deps chromium
+
+      - name: Generate posts (scrape -> Gemini -> render)
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_API_KEY_2: ${{ secrets.GEMINI_API_KEY_2 }}
+          BRAND_NAME: ${{ vars.BRAND_NAME || 'SANDESH' }}
+          MAX_POSTS_PER_RUN: ${{ vars.MAX_POSTS_PER_RUN || '2' }}
+        run: python -m src.main generate
+
+      - name: Commit state to main, push images to the orphan branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "news-bot"
+          git config user.email "news-bot@users.noreply.github.com"
+          git add -A state
+          git diff --cached --quiet || git commit -m "bot: generated posts [skip ci]"
+          git pull --rebase origin ${GITHUB_REF_NAME}
+          git push
+
+          # images go to the 'images' branch with FORCE-OVERWRITTEN history,
+          # so the repo never accumulates old image blobs (Instagram fetches
+          # them from raw.githubusercontent.com/<repo>/images/<file>)
+          if ls output/*.png >/dev/null 2>&1; then
+            cd output
+            rm -rf .git
+            git init -q -b images
+            git config user.name "news-bot"
+            git config user.email "news-bot@users.noreply.github.com"
+            git add ./*.png
+            git commit -qm "images $(date -u +%Y%m%d-%H%M)"
+            git push -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" images:images
+            rm -rf .git
+          fi
+
+      - name: Publish to Instagram / Facebook / X
+        env:
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          META_ACCESS_TOKEN: ${{ secrets.META_ACCESS_TOKEN }}
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          X_API_KEY: ${{ secrets.X_API_KEY }}
+          X_API_SECRET: ${{ secrets.X_API_SECRET }}
+          X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+          X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
+        run: python -m src.main publish
+
+      - name: Commit publish results
+        run: |
+          git add -A state
+          git diff --cached --quiet || git commit -m "bot: publish results [skip ci]"
+          git pull --rebase origin ${GITHUB_REF_NAME}
+          git push
+
+      - name: Ensure pacemaker is alive
+        if: always()
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+          REPO: ${{ github.repository }}
+        run: |
+          [ -z "$GH_PAT" ] && { echo "no GH_PAT secret — skipping"; exit 0; }
+          alive=$(curl -s -H "Authorization: Bearer $GH_PAT" \
+            "https://api.github.com/repos/$REPO/actions/workflows/pacemaker.yml/runs?per_page=2" \
+            | jq '[.workflow_runs[] | select(.status == "in_progress" or .status == "queued")] | length')
+          if [ "$alive" -eq 0 ]; then
+            echo "pacemaker not running — restarting it"
+            curl -s -X POST -H "Authorization: Bearer $GH_PAT" \
+              "https://api.github.com/repos/$REPO/actions/workflows/pacemaker.yml/dispatches" \
+              -d '{"ref":"main"}'
+          else
+            echo "pacemaker alive"
+          fi
