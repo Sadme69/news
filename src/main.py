@@ -75,8 +75,29 @@ def generate() -> int:
                     if art["text"]:
                         art_provider = c["source"]
                         break
+        # photo first (RSS thumbnail -> primary og:image -> other outlets in
+        # the cluster), so the compose call can safety-check it for free
+        image_uri, photo_credit = "", ""
+        if primary.get("image"):
+            image_uri = article.fetch_as_data_uri(article.upgrade_thumb(primary["image"]))
+            photo_credit = primary["source"]
+        if not image_uri and art.get("og_image"):
+            image_uri = article.fetch_as_data_uri(art["og_image"])
+            photo_credit = art_provider
+        if not image_uri:
+            for c in cluster:
+                if c["url"] == primary["url"]:
+                    continue
+                img_url = article.upgrade_thumb(c.get("image", "")) or \
+                    article.fetch_article(c["url"]).get("og_image", "")
+                if img_url:
+                    image_uri = article.fetch_as_data_uri(img_url)
+                    if image_uri:
+                        photo_credit = c["source"]
+                        break
+
         try:
-            post = brain.compose_post(story, art["text"], idx)
+            post = brain.compose_post(story, art["text"], image_uri)
         except Exception as e:
             print(f"  [warn] compose failed for '{story['topic']}': {e}")
             continue
@@ -86,30 +107,27 @@ def generate() -> int:
         if state.is_duplicate(post["headline"], post["topic"], history):
             continue
 
-        # photo: try the RSS thumbnail, then the primary article's og:image,
-        # then every other outlet in the cluster until one yields a photo
-        post["image_data_uri"] = ""
-        if post.get("image"):
-            post["image_data_uri"] = article.fetch_as_data_uri(article.upgrade_thumb(post["image"]))
-            post["photo_credit"] = primary["source"]
-        if not post["image_data_uri"] and art.get("og_image"):
-            post["image_data_uri"] = article.fetch_as_data_uri(art["og_image"])
-            post["photo_credit"] = art_provider
-        if not post["image_data_uri"]:
-            for c in cluster:
-                if c["url"] == primary["url"]:
-                    continue
-                img_url = article.upgrade_thumb(c.get("image", "")) or \
-                    article.fetch_article(c["url"]).get("og_image", "")
-                if img_url:
-                    post["image_data_uri"] = article.fetch_as_data_uri(img_url)
-                    if post["image_data_uri"]:
-                        post["photo_credit"] = c["source"]
-                        break
-        print(f"  {post['headline'][:60]}... photo={'yes' if post['image_data_uri'] else 'no'}, details={len(post['details'])} paras")
+        # content safety verdicts (came back in the same compose call)
+        if post["story_risk"] == "do_not_post":
+            print(f"  [policy] skipping '{post['headline'][:60]}' (cannot be covered within platform rules)")
+            state.record(history, post, "policy-skip")
+            for url, title in zip(post.get("cluster_urls", []), post.get("cluster_titles", [])):
+                if url != post["url"]:
+                    state.record(history, {"orig_title": title, "url": url,
+                                           "headline": post["headline"], "topic": post["topic"],
+                                           "source": post["source"]}, "policy-skip")
+            continue
+        if image_uri and (post["story_risk"] == "graphic" or not post["image_safe"]):
+            print(f"  [policy] dropping photo for '{post['headline'][:60]}' (risk={post['story_risk']}, image_safe={post['image_safe']})")
+            image_uri, photo_credit = "", ""
+
+        post["image_data_uri"] = image_uri
+        post["photo_credit"] = photo_credit
+        print(f"  {post['headline'][:60]}... photo={'yes' if image_uri else 'no'}, risk={post['story_risk']}, details={len(post['details'])} paras")
         posts.append(post)
 
     if not posts:
+        state.save_history(history)  # policy-skips must be remembered too
         _summary(["## News bot", "No posts could be composed this run."])
         state.save_queue([])
         return 0

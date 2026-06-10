@@ -30,10 +30,11 @@ for idx, story in enumerate(stories):
     cluster = story["cluster"]
     primary = next((c for c in cluster if c["lang"] == "en"), cluster[0])
     art = article.fetch_article(primary["url"])
-    post = brain.compose_post(story, art["text"], idx)
-    img_url = article.upgrade_thumb(post.get("image", "")) or art["og_image"]
+    img_url = article.upgrade_thumb(primary.get("image", "")) or art["og_image"]
+    image_uri = article.fetch_as_data_uri(img_url)
+    post = brain.compose_post(story, art["text"], image_uri)
     post["photo_credit"] = primary["source"]
-    post["image_data_uri"] = article.fetch_as_data_uri(img_url)
+    post["image_data_uri"] = "" if (post["story_risk"] == "graphic" or not post["image_safe"]) else image_uri
     posts.append(post)
     print(f"\n--- {post['source']} | {post['category']} | {post['template']}")
     print("headline:", post["headline_marked"])

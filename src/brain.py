@@ -75,10 +75,12 @@ _COMPOSE_SCHEMA = {
             "description": "short English paragraphs (2-3 sentences each) telling the full story — as many as the story needs, typically 4-10. They flow across the details slides.",
         },
         "hook": {"type": "string", "description": "1-2 punchy factual lines that open the caption — what shows before '...more', impossible to scroll past"},
-        "hashtags": {"type": "string", "description": "4-6 hashtags separated by spaces, mixing broad reach (#Bangladesh #News) with story-specific tags"},
+        "hashtags": {"type": "string", "description": "4-6 widely-used, non-restricted hashtags separated by spaces, mixing broad reach (#Bangladesh #News) with story-specific tags"},
         "tweet": {"type": "string", "description": "standalone X post, max 270 chars incl. 1-3 hashtags"},
+        "story_risk": {"type": "string", "enum": ["clean", "sensitive", "graphic", "do_not_post"]},
+        "image_safe": {"type": "boolean", "description": "false if the attached photo shows blood, corpses, graphic injury, weapons in use, or nudity; true otherwise or when no photo is attached"},
     },
-    "required": ["headline", "summary", "category", "template", "details", "hook", "hashtags", "tweet"],
+    "required": ["headline", "summary", "category", "template", "details", "hook", "hashtags", "tweet", "story_risk", "image_safe"],
 }
 
 _COMPOSE_PROMPT = """You are the editor of "{brand}", a Bangladeshi news page that posts in ENGLISH.
@@ -96,6 +98,11 @@ Details rules: short paragraphs (2-3 sentences each) telling the FULL story — 
 Hook rules: 1-2 lines that open the caption — it's all people see before "...more", so make it impossible to scroll past (a striking fact, number or question; still factual). The full story details follow it automatically, so don't repeat them.
 Tweet rules: standalone, lead with the hook, under 270 chars, 1-3 hashtags.
 
+Platform safety (this page must never violate Facebook/Instagram policies):
+- Never glorify or sensationalize violence; report it neutrally. Attribute every health/medical claim to its source (e.g. "according to the DGHS"). Use strictly neutral wording on political and communal stories.
+- story_risk: "clean" for normal news; "sensitive" for violent crime, disasters, communal or health stories (your wording must be extra careful); "graphic" if the story centers on gory/disturbing details (it will be posted without a photo); "do_not_post" ONLY if the story cannot be covered at all without violating platform policy (gratuitous gore, glorifying violence or terrorism, explicit content).
+- image_safe: a photo may be attached to this message. Set image_safe=false if it shows blood, dead bodies, graphic injuries, weapons being used on people, or nudity — anything Meta's filters would flag. If no photo is attached, set true.
+
 STORY HEADLINES (from the outlets):
 {titles}
 
@@ -104,9 +111,9 @@ ARTICLE TEXT (may be partial or Bangla; primary source: {primary_source}):
 """
 
 
-def _call_gemini(prompt: str, schema: dict) -> dict:
+def _call_gemini(parts: list, schema: dict) -> dict:
     body = {
-        "contents": [{"parts": [{"text": prompt}]}],
+        "contents": [{"parts": parts}],
         "generationConfig": {
             "temperature": 0.4,
             "responseMimeType": "application/json",
@@ -182,7 +189,7 @@ def select_stories(candidates: list, history: list) -> list:
         history=history_lines,
         candidates=cand_lines,
     )
-    result = _call_gemini(prompt, _SELECT_SCHEMA)
+    result = _call_gemini([{"text": prompt}], _SELECT_SCHEMA)
     stories = []
     for s in result.get("stories", [])[: config.MAX_POSTS_PER_RUN]:
         ids = [i for i in s.get("candidate_ids", []) if 0 <= i < len(candidates)]
@@ -209,8 +216,10 @@ def _build_caption(hook: str, details: list, hashtags: str, sources: str) -> str
     return body + tail
 
 
-def compose_post(story: dict, article_text: str, index: int = 0) -> dict:
-    """Phase 2 -> full post content for one selected story."""
+def compose_post(story: dict, article_text: str, image_data_uri: str = "") -> dict:
+    """Phase 2 -> full post content for one selected story. The candidate
+    photo rides along in the same request so Gemini safety-checks it for
+    free (no extra API call)."""
     cluster = story["cluster"]
     primary = next((c for c in cluster if c["lang"] == "en"), cluster[0])
     titles = "\n".join(f"- [{c['source']}] {c['title']}" for c in cluster)
@@ -220,7 +229,12 @@ def compose_post(story: dict, article_text: str, index: int = 0) -> dict:
         primary_source=primary["source"],
         article=article_text[:4500] or "(article text unavailable — use only the headlines)",
     )
-    p = _call_gemini(prompt, _COMPOSE_SCHEMA)
+    parts = [{"text": prompt}]
+    if image_data_uri.startswith("data:"):
+        header, b64 = image_data_uri.split(",", 1)
+        mime = header.split(":", 1)[1].split(";", 1)[0]
+        parts.append({"inline_data": {"mime_type": mime, "data": b64}})
+    p = _call_gemini(parts, _COMPOSE_SCHEMA)
     details = [d.strip() for d in p.get("details", []) if d.strip()][:14]
     marked = p["headline"][:130]
     sources = ", ".join(dict.fromkeys(c["source"] for c in cluster))
@@ -235,6 +249,8 @@ def compose_post(story: dict, article_text: str, index: int = 0) -> dict:
         "details": details,
         "caption": caption,
         "tweet": p["tweet"][:275],
+        "story_risk": p.get("story_risk", "clean"),
+        "image_safe": bool(p.get("image_safe", True)),
         "source": sources,
         "url": primary["url"],
         "image": primary.get("image", ""),
