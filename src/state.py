@@ -58,6 +58,36 @@ def record(history: list, item: dict, status: str) -> None:
     })
 
 
+_STOPWORDS = {
+    "the", "a", "an", "in", "on", "at", "of", "for", "to", "by", "with", "and",
+    "or", "as", "is", "are", "was", "were", "be", "been", "after", "over",
+    "amid", "against", "regarding", "about", "from", "its", "his", "her",
+}
+
+
+def _tokens(text: str) -> set:
+    words = re.findall(r"[a-z0-9]+", (text or "").lower())
+    return {w for w in words if w not in _STOPWORDS and len(w) > 2}
+
+
+def is_duplicate(headline: str, topic: str, history: list, threshold: float = 0.55) -> bool:
+    """Deterministic backstop for Gemini's semantic dedup: if the composed
+    headline/topic shares most of its words with something already posted,
+    it's the same story reworded."""
+    new = _tokens(headline) | _tokens(topic)
+    if not new:
+        return False
+    for e in history:
+        old = _tokens(e.get("headline", "")) | _tokens(e.get("topic", ""))
+        if not old:
+            continue
+        overlap = len(new & old) / len(new | old)
+        if overlap >= threshold:
+            print(f"  [dedup] '{headline[:60]}' matches posted '{e.get('headline', '')[:60]}' ({overlap:.2f})")
+            return True
+    return False
+
+
 def load_queue() -> list:
     if os.path.exists(config.QUEUE_FILE):
         with open(config.QUEUE_FILE, "r", encoding="utf-8") as f:

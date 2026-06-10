@@ -80,15 +80,32 @@ def generate() -> int:
         except Exception as e:
             print(f"  [warn] compose failed for '{story['topic']}': {e}")
             continue
-        # photo: RSS thumbnail (Dhaka Tribune) or the article's og:image;
-        # credit whichever outlet actually provided it
+
+        # deterministic dedup backstop — Gemini occasionally re-selects an
+        # already-posted story with different wording
+        if state.is_duplicate(post["headline"], post["topic"], history):
+            continue
+
+        # photo: try the RSS thumbnail, then the primary article's og:image,
+        # then every other outlet in the cluster until one yields a photo
+        post["image_data_uri"] = ""
         if post.get("image"):
-            img_url = article.upgrade_thumb(post["image"])
+            post["image_data_uri"] = article.fetch_as_data_uri(article.upgrade_thumb(post["image"]))
             post["photo_credit"] = primary["source"]
-        else:
-            img_url = art["og_image"]
+        if not post["image_data_uri"] and art.get("og_image"):
+            post["image_data_uri"] = article.fetch_as_data_uri(art["og_image"])
             post["photo_credit"] = art_provider
-        post["image_data_uri"] = article.fetch_as_data_uri(img_url)
+        if not post["image_data_uri"]:
+            for c in cluster:
+                if c["url"] == primary["url"]:
+                    continue
+                img_url = article.upgrade_thumb(c.get("image", "")) or \
+                    article.fetch_article(c["url"]).get("og_image", "")
+                if img_url:
+                    post["image_data_uri"] = article.fetch_as_data_uri(img_url)
+                    if post["image_data_uri"]:
+                        post["photo_credit"] = c["source"]
+                        break
         print(f"  {post['headline'][:60]}... photo={'yes' if post['image_data_uri'] else 'no'}, details={len(post['details'])} paras")
         posts.append(post)
 
