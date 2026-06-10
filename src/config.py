@@ -13,8 +13,9 @@ if os.path.exists(_env_file):
 
 # --- Gemini ---
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
-GEMINI_API_KEY_2 = os.environ.get("GEMINI_API_KEY_2", "")  # backup key
-GEMINI_API_KEYS = [k for k in (GEMINI_API_KEY, GEMINI_API_KEY_2) if k]
+GEMINI_API_KEY_2 = os.environ.get("GEMINI_API_KEY_2", "")  # backup keys
+GEMINI_API_KEY_3 = os.environ.get("GEMINI_API_KEY_3", "")
+GEMINI_API_KEYS = [k for k in (GEMINI_API_KEY, GEMINI_API_KEY_2, GEMINI_API_KEY_3) if k]
 GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
 # tried in order when the primary model keeps returning 429/5xx
 GEMINI_FALLBACK_MODELS = [
