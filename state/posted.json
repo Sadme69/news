@@ -1629,8 +1629,13 @@
   "headline": "Auto-rickshaw driver stabbed to death in Bhairab after dispute over motorcycle collision",
   "topic": "motorcycle collision leads to auto-rickshaw driver's stabbing death",
   "source": "Somoy News",
-  "status": "queued",
-  "at": "2026-06-10T23:07:03Z"
+  "status": "posted",
+  "at": "2026-06-10T23:07:03Z",
+  "results": {
+   "facebook": "1237737746078842_122096559549361546",
+   "instagram": "17880603318664242",
+   "x": "dry-run"
+  }
  },
  {
   "title_hash": "26460eef3e1bb298",
@@ -1638,8 +1643,13 @@
   "headline": "Auto-rickshaw driver stabbed to death in Bhairab after dispute over motorcycle collision",
   "topic": "motorcycle collision leads to auto-rickshaw driver's stabbing death",
   "source": "Somoy News",
-  "status": "queued",
-  "at": "2026-06-10T23:07:03Z"
+  "status": "posted",
+  "at": "2026-06-10T23:07:03Z",
+  "results": {
+   "facebook": "1237737746078842_122096559549361546",
+   "instagram": "17880603318664242",
+   "x": "dry-run"
+  }
  },
  {
   "title_hash": "9350801404e8b36d",
@@ -1647,8 +1657,13 @@
   "headline": "Ad-din Hospital's response on newborn deaths deemed unsatisfactory by Health Minister",
   "topic": "health minister dissatisfied with Ad-Din Hospital's response to infant deaths",
   "source": "The Daily Star, Somoy News",
-  "status": "queued",
-  "at": "2026-06-10T23:07:03Z"
+  "status": "posted",
+  "at": "2026-06-10T23:07:03Z",
+  "results": {
+   "facebook": "1237737746078842_122096560239361546",
+   "instagram": "18116906029762340",
+   "x": "dry-run"
+  }
  },
  {
   "title_hash": "da2a3ec67487c978",
@@ -1656,7 +1671,12 @@
   "headline": "Ad-din Hospital's response on newborn deaths deemed unsatisfactory by Health Minister",
   "topic": "health minister dissatisfied with Ad-Din Hospital's response to infant deaths",
   "source": "The Daily Star, Somoy News",
-  "status": "queued",
-  "at": "2026-06-10T23:07:03Z"
+  "status": "posted",
+  "at": "2026-06-10T23:07:03Z",
+  "results": {
+   "facebook": "1237737746078842_122096560239361546",
+   "instagram": "18116906029762340",
+   "x": "dry-run"
+  }
  }
 ]
