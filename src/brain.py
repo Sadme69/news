@@ -161,10 +161,18 @@ def _call_gemini(parts: list, schema: dict) -> dict:
                     budget.exhaust(pair, limit)
                     last_err = f"HTTP 429 on {model} (key {ki + 1}, persistent)"
                     break
+                if resp.status_code == 403:
+                    # usually Google momentarily flagging the CI runner's IP
+                    # or this key — move to the next key, don't crash and
+                    # don't bench the budget (it usually recovers)
+                    last_err = f"HTTP 403 on {model} (key {ki + 1})"
+                    break
                 if resp.status_code in (500, 502, 503, 504):
                     last_err = f"HTTP {resp.status_code} on {model}"
                     continue
-                resp.raise_for_status()
+                if resp.status_code != 200:
+                    last_err = f"HTTP {resp.status_code} on {model} (key {ki + 1})"
+                    break
                 data = resp.json()
                 text = data["candidates"][0]["content"]["parts"][0]["text"]
                 return json.loads(text)

@@ -35,14 +35,15 @@ jobs:
             echo "cycle $cycle: sleeping ${wait}s until next :05"
             sleep $wait
 
-            # watchdog: skip only if the news bot already ran THIS hour
-            # (GitHub's cron sometimes fires late — a delayed run from the
-            # previous hour must not suppress this hour's heartbeat)
-            latest=$(api "https://api.github.com/repos/$REPO/actions/workflows/news-bot.yml/runs?per_page=1" \
-                     | jq -r '.workflow_runs[0].created_at // empty')
+            # watchdog: skip only if the news bot already ran THIS hour and
+            # didn't fail (late cron runs from the previous hour, and crashed
+            # runs, must not suppress this hour's heartbeat)
             hour_start=$(date -u +%Y-%m-%dT%H:00:00Z)
-            if [ -n "$latest" ] && [ "$latest" \> "$hour_start" ]; then
-              echo "news bot already ran this hour ($latest) — skipping dispatch"
+            ok_this_hour=$(api "https://api.github.com/repos/$REPO/actions/workflows/news-bot.yml/runs?per_page=5" \
+              | jq --arg hs "$hour_start" \
+                '[.workflow_runs[] | select(.created_at > $hs and (.conclusion == "success" or .status != "completed"))] | length')
+            if [ "${ok_this_hour:-0}" -gt 0 ]; then
+              echo "news bot already ran successfully (or is running) this hour — skipping dispatch"
               continue
             fi
 
