@@ -101,13 +101,6 @@ SOURCES = [
         "lang": "en",
     },
     {
-        "id": "tbsnews",
-        "name": "The Business Standard",
-        "kind": "news_sitemap",
-        "url": "https://www.tbsnews.net/googlenews.xml",
-        "lang": "en",
-    },
-    {
         "id": "banglatribune",
         "name": "Bangla Tribune",
         "kind": "news_sitemap",
