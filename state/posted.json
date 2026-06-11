@@ -4296,5 +4296,32 @@
    "instagram": "error: 403 Client Error: Forbidden for url: https://graph.facebook.com/v21.0/17841416579385088/media_publish :: {\"error\":{\"message\":\"Application request limit r",
    "x": "dry-run"
   }
+ },
+ {
+  "title_hash": "50536d1238da7e79",
+  "url": "https://www.dhakatribune.com/bangladesh/court/412370/special-prosecution-team-formed-for-pallabi-minor",
+  "headline": "Special legal team formed to fast-track death-reference cases in High Court",
+  "topic": "special bench to fast-track rape-murder cases",
+  "source": "Dhaka Tribune, The Daily Star, Jamuna TV",
+  "status": "queued",
+  "at": "2026-06-11T14:07:28Z"
+ },
+ {
+  "title_hash": "99ea27f7c094f7d2",
+  "url": "https://www.thedailystar.net/news/news/special-legal-team-formed-women-and-children-repression-death-reference-cases-4196506",
+  "headline": "Special legal team formed to fast-track death-reference cases in High Court",
+  "topic": "special bench to fast-track rape-murder cases",
+  "source": "Dhaka Tribune, The Daily Star, Jamuna TV",
+  "status": "queued",
+  "at": "2026-06-11T14:07:28Z"
+ },
+ {
+  "title_hash": "6db0b1d84acf7121",
+  "url": "https://www.jamuna.tv/national/657893",
+  "headline": "Special legal team formed to fast-track death-reference cases in High Court",
+  "topic": "special bench to fast-track rape-murder cases",
+  "source": "Dhaka Tribune, The Daily Star, Jamuna TV",
+  "status": "queued",
+  "at": "2026-06-11T14:07:28Z"
  }
 ]
