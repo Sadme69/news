@@ -102,12 +102,20 @@ def is_duplicate(headline: str, topic: str, history: list, threshold: float = 0.
         old_words = _tokens(old_text)
         if not old_words:
             continue
-        shared_words = new_words & old_words
-        overlap = len(shared_words) / len(new_words | old_words)
+        shared = new_words & old_words
+        jaccard = len(shared) / len(new_words | old_words)
+        # containment on headlines alone: topics vary in wording and would
+        # dilute the ratio (a reworded headline shares most of its words)
+        hl_new, hl_old = _tokens(headline), _tokens(e.get("headline", ""))
+        shared_hl = hl_new & hl_old
+        containment = (len(shared_hl) / min(len(hl_new), len(hl_old))
+                       if hl_new and hl_old else 0.0)
         shared_nums = new_nums & _numbers(old_text)
-        if overlap >= threshold or (shared_nums and len(shared_words) >= 3):
+        if (jaccard >= threshold
+                or (shared_nums and len(shared) >= 3)
+                or (containment >= 0.55 and len(shared_hl) >= 4)):
             print(f"  [dedup] '{headline[:60]}' matches posted '{e.get('headline', '')[:60]}' "
-                  f"(overlap={overlap:.2f}, shared figures={sorted(shared_nums)})")
+                  f"(jaccard={jaccard:.2f}, containment={containment:.2f}, figures={sorted(shared_nums)})")
             return True
     return False
 
