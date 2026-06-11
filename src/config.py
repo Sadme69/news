@@ -93,6 +93,34 @@ SOURCES = [
         "url": "https://www.prothomalo.com/feed",
         "lang": "bn",
     },
+    {
+        "id": "bdnews24",
+        "name": "bdnews24.com",
+        "kind": "news_sitemap",
+        "url": "https://bdnews24.com/news_sitemap.xml",
+        "lang": "en",
+    },
+    {
+        "id": "tbsnews",
+        "name": "The Business Standard",
+        "kind": "news_sitemap",
+        "url": "https://www.tbsnews.net/googlenews.xml",
+        "lang": "en",
+    },
+    {
+        "id": "banglatribune",
+        "name": "Bangla Tribune",
+        "kind": "news_sitemap",
+        "url": "https://www.banglatribune.com/news-sitemap.xml",
+        "lang": "bn",
+    },
+    {
+        "id": "ittefaq",
+        "name": "Daily Ittefaq",
+        "kind": "news_sitemap",
+        "url": "https://www.ittefaq.com.bd/news-sitemap.xml",
+        "lang": "bn",
+    },
 ]
 
 # --- Social credentials (set as GitHub secrets; pipeline dry-runs without them) ---

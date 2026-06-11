@@ -97,6 +97,7 @@ def _fetch_news_sitemap(src) -> list:
         loc = re.search(r"<loc>\s*(.*?)\s*</loc>", block)
         title = re.search(r"<news:title>\s*(.*?)\s*</news:title>", block, re.S)
         date = re.search(r"<news:publication_date>\s*(.*?)\s*</news:publication_date>", block)
+        img = re.search(r"<image:loc>\s*(.*?)\s*</image:loc>", block)
         if not (loc and title):
             continue
         when = _parse_iso(date.group(1)) if date else datetime.now(timezone.utc)
@@ -109,7 +110,8 @@ def _fetch_news_sitemap(src) -> list:
         if m:
             cat = m.group(1)
         t = re.sub(r"<!\[CDATA\[|\]\]>", "", title.group(1)).strip()
-        items.append(_item(src, t, url, when, category=cat))
+        items.append(_item(src, t, url, when,
+                           image=img.group(1) if img else "", category=cat))
         if len(items) >= MAX_PER_SOURCE:
             break
     return items
