@@ -6,3 +6,4 @@ venv/
 preview/
 output/
 README.local.md
+_*.txt
