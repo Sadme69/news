@@ -2483,8 +2483,13 @@
   "headline": "Sylhet struggles with water crisis: Only half of demand met as summer worsens shortage",
   "topic": "dhaka air pollution ranks second globally",
   "source": "Dhaka Tribune, Prothom Alo",
-  "status": "queued",
-  "at": "2026-06-11T04:57:10Z"
+  "status": "posted",
+  "at": "2026-06-11T04:57:10Z",
+  "results": {
+   "facebook": "1237737746078842_122096695455361546",
+   "instagram": "error: 403 Client Error: Forbidden for url: https://graph.facebook.com/v21.0/17841416579385088/media_publish :: {\"error\":{\"message\":\"Application request limit r",
+   "x": "dry-run"
+  }
  },
  {
   "title_hash": "6fe2d33d71736b3a",
@@ -2492,8 +2497,13 @@
   "headline": "Sylhet struggles with water crisis: Only half of demand met as summer worsens shortage",
   "topic": "dhaka air pollution ranks second globally",
   "source": "Dhaka Tribune, Prothom Alo",
-  "status": "queued",
-  "at": "2026-06-11T04:57:10Z"
+  "status": "posted",
+  "at": "2026-06-11T04:57:10Z",
+  "results": {
+   "facebook": "1237737746078842_122096695455361546",
+   "instagram": "error: 403 Client Error: Forbidden for url: https://graph.facebook.com/v21.0/17841416579385088/media_publish :: {\"error\":{\"message\":\"Application request limit r",
+   "x": "dry-run"
+  }
  },
  {
   "title_hash": "7e7040be4abb0d14",
@@ -2501,8 +2511,13 @@
   "headline": "Two killed in highway crash as speeding van hits parked truck on Dhaka-Chattogram highway",
   "topic": "truck collision leads to deaths of driver and assistant",
   "source": "Prothom Alo, Dhaka Tribune",
-  "status": "queued",
-  "at": "2026-06-11T04:57:10Z"
+  "status": "posted",
+  "at": "2026-06-11T04:57:10Z",
+  "results": {
+   "facebook": "1237737746078842_122096696205361546",
+   "instagram": "error: 403 Client Error: Forbidden for url: https://graph.facebook.com/v21.0/17841416579385088/media_publish :: {\"error\":{\"message\":\"Application request limit r",
+   "x": "dry-run"
+  }
  },
  {
   "title_hash": "1cd83821246cfa74",
@@ -2510,7 +2525,12 @@
   "headline": "Two killed in highway crash as speeding van hits parked truck on Dhaka-Chattogram highway",
   "topic": "truck collision leads to deaths of driver and assistant",
   "source": "Prothom Alo, Dhaka Tribune",
-  "status": "queued",
-  "at": "2026-06-11T04:57:10Z"
+  "status": "posted",
+  "at": "2026-06-11T04:57:10Z",
+  "results": {
+   "facebook": "1237737746078842_122096696205361546",
+   "instagram": "error: 403 Client Error: Forbidden for url: https://graph.facebook.com/v21.0/17841416579385088/media_publish :: {\"error\":{\"message\":\"Application request limit r",
+   "x": "dry-run"
+  }
  }
 ]
