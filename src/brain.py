@@ -45,7 +45,7 @@ _SELECT_PROMPT = """You are the editor of "{brand}", a Bangladeshi news page tha
 Below are fresh candidate stories from 4 Bangladeshi outlets (some headlines in Bangla), plus topics we already posted.
 
 1. CLUSTER candidates covering the SAME story (it often appears on multiple outlets, sometimes Bangla on one, English on another). One cluster = one post.
-2. DROP any story we already posted (see list). Same event = duplicate even if worded differently or in another language.
+2. DROP any story we already posted (see list). Same event = duplicate even if worded differently or in another language. This INCLUDES new stages of an event we already covered (announced -> approved -> presented -> reactions are ALL one story, not four). Only re-cover an ongoing event if the development is itself a major standalone story (a verdict, a dramatic reversal, a big new toll) — and even then, at most once.
 3. SELECT the {max_posts} remaining stories with the HIGHEST VIRAL POTENTIAL. Rank by how likely Bangladeshi social media users are to share, comment and react:
    - breaking events and big developments in ongoing national dramas
    - stories that affect millions (prices, jobs, transport, weather, disasters)

@@ -65,25 +65,49 @@ _STOPWORDS = {
 }
 
 
+def _stem(w: str) -> str:
+    for suf in ("ing", "ed", "es", "s"):
+        if len(w) > 4 and w.endswith(suf):
+            return w[: -len(suf)]
+    return w
+
+
 def _tokens(text: str) -> set:
-    words = re.findall(r"[a-z0-9]+", (text or "").lower())
-    return {w for w in words if w not in _STOPWORDS and len(w) > 2}
+    words = re.findall(r"[a-z]+", (text or "").lower())
+    return {_stem(w) for w in words if w not in _STOPWORDS and len(w) > 2}
 
 
-def is_duplicate(headline: str, topic: str, history: list, threshold: float = 0.55) -> bool:
-    """Deterministic backstop for Gemini's semantic dedup: if the composed
-    headline/topic shares most of its words with something already posted,
-    it's the same story reworded."""
-    new = _tokens(headline) | _tokens(topic)
-    if not new:
+def _numbers(text: str) -> set:
+    """Distinctive figures ('9.38', '404', '6.5') are the strongest same-story
+    signal there is. Plain years are too generic to count."""
+    out = set()
+    for n in re.findall(r"\d+(?:\.\d+)?", text or ""):
+        if re.fullmatch(r"(19|20)\d{2}", n) or len(n) < 2:
+            continue
+        out.add(n)
+    return out
+
+
+def is_duplicate(headline: str, topic: str, history: list, threshold: float = 0.5) -> bool:
+    """Deterministic backstop for Gemini's semantic dedup. Two triggers:
+    high word overlap (same story reworded), or a shared distinctive figure
+    plus several shared content words (same event at a different stage,
+    e.g. 'budget to be presented' -> 'budget unveiled')."""
+    new_words = _tokens(headline) | _tokens(topic)
+    new_nums = _numbers(headline) | _numbers(topic)
+    if not new_words:
         return False
     for e in history:
-        old = _tokens(e.get("headline", "")) | _tokens(e.get("topic", ""))
-        if not old:
+        old_text = f"{e.get('headline', '')} {e.get('topic', '')}"
+        old_words = _tokens(old_text)
+        if not old_words:
             continue
-        overlap = len(new & old) / len(new | old)
-        if overlap >= threshold:
-            print(f"  [dedup] '{headline[:60]}' matches posted '{e.get('headline', '')[:60]}' ({overlap:.2f})")
+        shared_words = new_words & old_words
+        overlap = len(shared_words) / len(new_words | old_words)
+        shared_nums = new_nums & _numbers(old_text)
+        if overlap >= threshold or (shared_nums and len(shared_words) >= 3):
+            print(f"  [dedup] '{headline[:60]}' matches posted '{e.get('headline', '')[:60]}' "
+                  f"(overlap={overlap:.2f}, shared figures={sorted(shared_nums)})")
             return True
     return False
 
