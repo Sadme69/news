@@ -3428,5 +3428,59 @@
    "instagram": "error: 403 Client Error: Forbidden for url: https://graph.facebook.com/v21.0/17841416579385088/media_publish :: {\"error\":{\"message\":\"Application request limit r",
    "x": "dry-run"
   }
+ },
+ {
+  "title_hash": "b5ffea57f9c99355",
+  "url": "https://www.dhakatribune.com/bangladesh/412300/49-982-hajj-pilgrims-return-home-49-die-in-saudi",
+  "headline": "Nearly 50,000 Bangladeshi Hajj pilgrims return home, 49 pilgrims die in Saudi Arabia",
+  "topic": "bangladeshi hajj pilgrims die in saudi arabia",
+  "source": "Dhaka Tribune",
+  "status": "queued",
+  "at": "2026-06-11T09:06:10Z"
+ },
+ {
+  "title_hash": "dac8536fdb3e2949",
+  "url": "https://www.dhakatribune.com/bangladesh/412276/bangladeshi-woman-dies-in-delhi-hotel-fire-toll",
+  "headline": "Nearly 50,000 Bangladeshi Hajj pilgrims return home, 49 pilgrims die in Saudi Arabia",
+  "topic": "bangladeshi hajj pilgrims die in saudi arabia",
+  "source": "Dhaka Tribune",
+  "status": "queued",
+  "at": "2026-06-11T09:06:10Z"
+ },
+ {
+  "title_hash": "8a9eb65881d8f68d",
+  "url": "https://www.dhakatribune.com/bangladesh/accidents/412297/5-suffer-burn-injuries-in-narayanganj-%E2%80%98gas",
+  "headline": "Gas cylinder explosion in Narayanganj leaves five, including a family of four, with severe burns",
+  "topic": "gas cylinder explosion injures 5 in narayanganj",
+  "source": "Dhaka Tribune, Jamuna TV, The Daily Star, Somoy News",
+  "status": "queued",
+  "at": "2026-06-11T09:06:10Z"
+ },
+ {
+  "title_hash": "5387f65e5564a30b",
+  "url": "https://www.jamuna.tv/all-bangladesh/657894",
+  "headline": "Gas cylinder explosion in Narayanganj leaves five, including a family of four, with severe burns",
+  "topic": "gas cylinder explosion injures 5 in narayanganj",
+  "source": "Dhaka Tribune, Jamuna TV, The Daily Star, Somoy News",
+  "status": "queued",
+  "at": "2026-06-11T09:06:10Z"
+ },
+ {
+  "title_hash": "75a01697ef34ea76",
+  "url": "https://www.thedailystar.net/news/accidents-fires/news/five-burnt-gas-explosion-narayanganj-house-4196141",
+  "headline": "Gas cylinder explosion in Narayanganj leaves five, including a family of four, with severe burns",
+  "topic": "gas cylinder explosion injures 5 in narayanganj",
+  "source": "Dhaka Tribune, Jamuna TV, The Daily Star, Somoy News",
+  "status": "queued",
+  "at": "2026-06-11T09:06:10Z"
+ },
+ {
+  "title_hash": "e977909b79926698",
+  "url": "https://www.somoynews.tv/news/2026-06-11/UxP6wNDQ",
+  "headline": "Gas cylinder explosion in Narayanganj leaves five, including a family of four, with severe burns",
+  "topic": "gas cylinder explosion injures 5 in narayanganj",
+  "source": "Dhaka Tribune, Jamuna TV, The Daily Star, Somoy News",
+  "status": "queued",
+  "at": "2026-06-11T09:06:10Z"
  }
 ]
